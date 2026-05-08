@@ -1,0 +1,20 @@
+# Environment files with secrets
+.env
+.env.*
+
+# Example environment files
+.env.example
+
+# Node dependencies
+node_modules/
+
+# Netlify build artifacts
+.netlify/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor temp files
+*.log
+*.tmp

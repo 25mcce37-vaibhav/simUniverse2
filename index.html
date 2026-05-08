@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIMU-VERSE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <!-- KaTeX for math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+
+</head>
+
+<body>
+
+  <canvas id="stars-canvas"></canvas>
+
+  <!-- LOGIN SCREEN -->
+
+
+  <!-- MAIN APP -->
+  <div id="app" class="new-theme">
+    <nav>
+      <div class="nav-brand" onclick="goHome()">SIMU-VERSE</div>
+      <div class="nav-breadcrumb" id="nav-breadcrumb"></div>
+      <div class="nav-user">
+        <button class="btn-about" onclick="openAboutModal()"
+          style="background:none;border:none;color:var(--neon-blue);cursor:pointer;font-weight:600;font-family:'Rajdhani',sans-serif;letter-spacing:0.05em;font-size:1rem;">ABOUT</button>
+      </div>
+    </nav>
+
+    <div id="main-content">
+      <!-- TOPIC SELECTION -->
+      <div id="topic-screen">
+        <div style="text-align:center; padding: 20px 0 50px;">
+          <div class="screen-title" style="font-size:2.2rem; text-align:center;">SELECT YOUR SIMULATION</div>
+          <div class="screen-sub">Choose a physics domain to explore through AI-guided learning & interactive simulation
+          </div>
+        </div>
+        <div class="topics-grid">
+          <div class="topic-card wave" onclick="selectTopic('wave')">
+            <div class="topic-icon">🌊</div>
+            <div class="topic-name">WAVE INTERFERENCE & DIFFRACTION</div>
+            <div class="topic-desc">Explore how waves interact, interfere constructively and destructively, and bend
+              around obstacles through interactive visual experiments.</div>
+            <div class="topic-subs">
+              <span class="sub-tag">Young's Double Slit</span>
+              <span class="sub-tag">Single Slit</span>
+            </div>
+            <div class="topic-arrow">→</div>
+          </div>
+          <div class="topic-card projectile" onclick="selectTopic('projectile')">
+            <div class="topic-icon">🚀</div>
+            <div class="topic-name">PROJECTILE MOTION & ENERGY CONSERVATION</div>
+            <div class="topic-desc">Investigate the physics of oblique projection — trajectory paths, energy
+              transformations from kinetic to potential throughout the flight.</div>
+            <div class="topic-subs">
+              <span class="sub-tag">Oblique Projection</span>
+              <span class="sub-tag">Energy Conservation</span>
+            </div>
+            <div class="topic-arrow">→</div>
+          </div>
+          <div class="topic-card electric" onclick="selectTopic('electric')">
+            <div class="topic-icon">⚡</div>
+            <div class="topic-name">ELECTRIC FIELD & POTENTIAL</div>
+            <div class="topic-desc">Visualise invisible electric field lines, equipotential surfaces, and force vectors
+              for single and complex multi-charge configurations.</div>
+            <div class="topic-subs">
+              <span class="sub-tag">Single Charge</span>
+              <span class="sub-tag">Multiple Charges</span>
+              <span class="sub-tag">Field Lines</span>
+              <span class="sub-tag">Equipotential</span>
+            </div>
+            <div class="topic-arrow">→</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LEARNING SCREEN -->
+      <div id="learning-screen">
+        <div class="phase-header">
+          <button class="btn-back" onclick="goHome()">← Back</button>
+          <div class="phase-badge learn">LEARNING PHASE</div>
+        </div>
+
+        <!-- Subtopic selector -->
+        <div id="subtopic-list" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;"></div>
+
+        <!-- AI LESSON PLAYER — full width -->
+        <div id="lesson-wrapper" style="margin-bottom:28px;">
+
+          <!-- Loading -->
+          <div id="vid-loading"
+            style="background:rgba(14,8,38,0.85);border:1px solid rgba(0,212,255,0.2);border-radius:20px;padding:56px 40px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;min-height:320px;">
+            <div
+              style="font-family:'Inter',monospace;font-size:0.7rem;letter-spacing:0.3em;color:var(--neon-blue);padding:4px 16px;border:1px solid rgba(0,212,255,0.35);border-radius:20px;animation:pulse 1.5s infinite;">
+              ⚡ AI LESSON ENGINE</div>
+            <div
+              style="font-family:'Inter',monospace;font-size:1.2rem;font-weight:700;color:var(--text);text-align:center;"
+              id="video-title">Select a subtopic</div>
+            <div style="font-size:0.85rem;color:var(--muted);letter-spacing:0.08em;" id="video-status">Choose a subtopic
+              above to generate your lesson</div>
+            <div id="loading-dots" style="display:none;gap:8px;align-items:center;">
+              <div
+                style="width:8px;height:8px;border-radius:50%;background:var(--neon-blue);animation:typing 1s infinite;">
+              </div>
+              <div
+                style="width:8px;height:8px;border-radius:50%;background:var(--neon-blue);animation:typing 1s 0.2s infinite;">
+              </div>
+              <div
+                style="width:8px;height:8px;border-radius:50%;background:var(--neon-blue);animation:typing 1s 0.4s infinite;">
+              </div>
+            </div>
+          </div>
+
+          <!-- Slide player -->
+          <div id="vid-player" style="display:none;">
+            <!-- Progress row -->
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+              <div id="slide-counter"
+                style="font-family:'Inter',monospace;font-size:0.7rem;color:var(--muted);white-space:nowrap;">SLIDE 1
+                / 6</div>
+              <div style="flex:1;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;">
+                <div id="slide-progress-bar"
+                  style="height:100%;background:linear-gradient(90deg,var(--neon-blue),var(--neon-purple));border-radius:2px;transition:width 0.4s;width:16%;">
+                </div>
+              </div>
+              <button onclick="toggleAutoPlay()" id="btn-autoplay"
+                style="padding:5px 14px;background:rgba(0,255,159,0.08);border:1px solid rgba(0,255,159,0.3);border-radius:8px;color:var(--neon-green);font-family:'Inter',monospace;font-size:0.65rem;font-weight:700;letter-spacing:0.1em;cursor:pointer;white-space:nowrap;">▶
+                AUTO</button>
+            </div>
+            <!-- HTML slide container -->
+            <div id="html-slide"
+              style="background:rgba(8,4,24,0.95);border:1px solid rgba(0,212,255,0.18);border-radius:20px;overflow:hidden;min-height:480px;transition:opacity 0.3s,transform 0.3s;">
+            </div>
+            <!-- Nav row -->
+            <div style="display:flex;align-items:center;gap:12px;margin-top:14px;">
+              <button onclick="slideNav(-1)"
+                style="padding:10px 24px;background:transparent;border:1px solid rgba(0,212,255,0.25);border-radius:10px;color:var(--neon-blue);font-family:'Rajdhani',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;"
+                onmouseover="this.style.background='rgba(0,212,255,0.08)'"
+                onmouseout="this.style.background='transparent'">◀ PREV</button>
+              <div id="slide-dots" style="flex:1;display:flex;justify-content:center;gap:7px;align-items:center;"></div>
+              <button onclick="slideNav(1)"
+                style="padding:10px 24px;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.35);border-radius:10px;color:var(--neon-blue);font-family:'Rajdhani',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;"
+                onmouseover="this.style.background='rgba(0,212,255,0.15)'"
+                onmouseout="this.style.background='rgba(0,212,255,0.08)'">NEXT ▶</button>
+            </div>
+          </div>
+
+          <!-- Error -->
+          <div id="vid-error"
+            style="display:none;background:rgba(14,8,38,0.85);border:1px solid rgba(255,107,43,0.3);border-radius:20px;padding:48px;text-align:center;">
+            <div style="font-size:2.5rem;margin-bottom:12px;">⚠️</div>
+            <div style="font-family:'Inter',monospace;font-size:0.9rem;color:var(--neon-orange);margin-bottom:8px;">
+              Lesson Generation Failed</div>
+            <div style="font-size:0.85rem;color:var(--muted);margin-bottom:20px;" id="error-msg">Check connection and
+              retry.</div>
+            <button onclick="retryLesson()"
+              style="padding:10px 24px;background:rgba(255,107,43,0.1);border:1px solid rgba(255,107,43,0.4);border-radius:10px;color:var(--neon-orange);font-family:'Rajdhani',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;">↺
+              Retry</button>
+          </div>
+        </div>
+
+        <div class="learning-info" id="learning-info"></div>
+
+        <div class="engineering-cta-wrap">
+          <button id="engineeringApplicationsBtn" class="engineering-cta"
+            onclick="openEngineeringApplications(currentTopic)">
+            🏗️ Engineering Applications
+          </button>
+        </div>
+
+        <!-- === NEW VIDEO BLOCK === -->
+        <div class="video-block" id="topic-video-block" style="display: none;">
+          <div class="video-block-header">
+            <span class="video-badge">📺 LESSON VIDEO</span>
+            <span class="video-credit">source: YouTube</span>
+          </div>
+          <div class="video-container" id="video-container">
+            <!-- Thumbnail + play button overlay -->
+            <div class="video-thumb-wrapper" id="video-thumb-wrapper">
+              <img id="video-thumbnail" src="" alt="Video thumbnail" class="video-thumb">
+              <div class="play-overlay" id="play-overlay">
+                <div class="play-icon">▶</div>
+              </div>
+            </div>
+            <!-- iframe will be injected here after click -->
+          </div>
+          <div class="video-caption" id="video-caption">
+            Watch this short video to reinforce the concepts above.
+          </div>
+        </div>
+        <!-- Button to open book references modal -->
+        <div style="display: flex; justify-content: center; margin: 20px 0 10px 0;">
+          <button id="openRefsBtn" class="btn-proceed"
+            style="background: linear-gradient(135deg, rgba(180, 79, 255, 0.15), rgba(0, 212, 255, 0.1)); border-color: var(--neon-purple); color: var(--neon-purple); width: auto; padding: 14px 32px;">
+            📚 BOOK REFERENCES
+          </button>
+        </div>
+        <!-- Attempt Evaluation Button -->
+        <div style="display: flex; justify-content: center; margin: 10px 0 20px 0;">
+          <button id="attemptEvalBtn" class="btn-proceed"
+            style="background: linear-gradient(135deg, rgba(0, 255, 159, 0.15), rgba(0, 212, 255, 0.1)); border-color: var(--neon-green); color: var(--neon-green); width: auto; padding: 14px 32px;">
+            📝 Attempt Evaluation
+          </button>
+        </div>
+
+        <button class="btn-proceed" onclick="goToSimulation()">
+          ✅ I've Learned — Start Simulation →
+        </button>
+      </div>
+
+      <!-- ENGINEERING APPLICATIONS SCREEN -->
+      <div id="engineering-screen"></div>
+
+      <!-- SIMULATION SCREEN -->
+      <div id="simulation-screen">
+        <div class="phase-header">
+          <button class="btn-back" onclick="goToLearning()">← Back to Learning</button>
+          <div class="phase-badge adapt">SIMULATION PHASE</div>
+        </div>
+
+        <div class="sim-layout">
+          <div class="sim-canvas-area">
+            <div
+              style="font-family:'Inter',monospace; font-size:0.82rem; font-weight:700; letter-spacing:0.15em; color:var(--muted); display:flex;align-items:center;gap:12px;">
+              <span id="sim-canvas-title">SIMULATION</span>
+              <span id="sim-subtopic-badge" class="sim-subtopic-badge">MODE</span>
+              <span style="flex:1;height:1px;background:rgba(255,255,255,0.05);"></span>
+              <span style="font-size:0.65rem;color:var(--neon-blue);">INTERACTIVE • REAL-TIME</span>
+            </div>
+            <canvas id="simCanvas"></canvas>
+            <div class="measurements" id="measurements-display"></div>
+          </div>
+          <div class="sim-controls-panel" id="controls-panel"></div>
+        </div>
+      </div>
+    </div>
+    <footer class="app-footer"
+      style="text-align:center;padding:25px;color:var(--muted);font-size:0.85rem;border-top:1px solid rgba(255,255,255,0.05);margin-top:40px;background:rgba(8,4,24,0.6);">
+      &copy; 2026 SimuVerse Project. All rights reserved. <br>
+      <span
+        style="font-size:0.75rem;opacity:0.6;font-family:'Rajdhani',sans-serif;letter-spacing:0.1em;color:var(--neon-blue);">Designed
+        with a scientific futuristic style.</span>
+    </footer>
+  </div>
+
+  <!-- AI Chatbot -->
+  <div id="chat-panel" style="display:none;">
+    <div class="chat-window" id="chat-window">
+      <div class="chat-header">
+        <div class="bot-avatar">🤖</div>
+        <div class="bot-info">
+          <div class="name">NOVA — Physics AI</div>
+          <div class="status"><span class="status-dot"></span> Online</div>
+        </div>
+        <button id="btn-stop-speak" onclick="stopSpeaking()"
+          style="display:none;margin-left:auto;background:none;border:none;color:var(--neon-orange);cursor:pointer;font-size:1.1rem;margin-right:10px;animation:pulse 1.5s infinite;"
+          title="Stop Speaking">⏹</button>
+        <button id="btn-mute" onclick="toggleMute()"
+          style="margin-left:auto;background:none;border:none;color:var(--neon-blue);cursor:pointer;font-size:1.1rem;margin-right:10px;"
+          title="Mute/Unmute">🔊</button>
+        <button onclick="toggleChat()"
+          style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem;">✕</button>
+      </div>
+      <div class="chat-messages" id="chat-messages"></div>
+      <div class="chat-chips" id="chat-chips">
+        <button type="button" onclick="sendChipPrompt('Explain this simulation')">Explain this simulation</button>
+        <button type="button" onclick="sendChipPrompt('What is KE?')">What is KE?</button>
+        <button type="button" onclick="sendChipPrompt('Give me a formula')">Give me a formula</button>
+      </div>
+      <div class="chat-input-area">
+        <button class="btn-mic" id="btn-mic" onclick="toggleVoiceRecording()" title="Voice Input"
+          style="background:none;border:none;font-size:1.2rem;cursor:pointer;padding:0 8px;">🎤</button>
+        <textarea class="chat-input" id="chat-input" placeholder="Ask about any concept..." rows="1"
+          onkeydown="chatKeydown(event)"></textarea>
+        <button class="btn-send" onclick="sendChat()">↑</button>
+      </div>
+    </div>
+    <button class="chat-toggle" onclick="toggleChat()" aria-label="Open physics chatbot">
+      💬
+      <div class="chat-badge">AI</div>
+    </button>
+  </div>
+  <script src="engineeringApplications.js"></script>
+  <script src="app.js"></script>
+  <!-- BOOK REFERENCES MODAL -->
+  <div id="refsModal" class="refs-modal">
+    <div class="refs-container">
+      <div class="refs-header">
+        <h2>📖 BOOK REFERENCES</h2>
+        <button class="refs-close" id="closeRefsBtn">← BACK TO LESSON</button>
+      </div>
+      <div class="refs-tabs" id="refsTabs">
+        <div class="refs-tab active" data-topic="projectile">PROJECTILE MOTION</div>
+        <div class="refs-tab" data-topic="wave">WAVE OPTICS</div>
+        <div class="refs-tab" data-topic="electric">ELECTROSTATICS</div>
+      </div>
+      <div class="refs-slideshow" id="refsSlideshow">
+        <img id="refsSlideImg" class="refs-slide-img" src="" alt="Slide">
+      </div>
+      <div class="refs-nav">
+        <button class="refs-nav-btn" id="refsPrevBtn">◀ PREV</button>
+        <span class="refs-counter" id="refsCounter">1 / 1</span>
+        <button class="refs-nav-btn" id="refsNextBtn">NEXT ▶</button>
+      </div>
+    </div>
+  </div>
+  <!-- ========== QUIZ / EVALUATION MODAL ========== -->
+  <div id="quizModal" class="quiz-modal">
+    <div class="quiz-container">
+      <div class="quiz-header">
+        <h2 id="quizTitle">📝 Evaluation</h2>
+        <button class="quiz-close" id="closeQuizBtn">✕</button>
+      </div>
+      <div class="quiz-body" id="quizBody">
+        <!-- Question area will be dynamically injected -->
+      </div>
+      <div class="quiz-footer" id="quizFooter">
+        <button class="quiz-nav-btn" id="quizPrevBtn" disabled>◀ PREV</button>
+        <span id="quizCounter">Question 1 / 10</span>
+        <button class="quiz-nav-btn" id="quizNextBtn">NEXT ▶</button>
+        <button class="quiz-submit-btn" id="quizSubmitBtn" style="display: none;">✅ SUBMIT</button>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- ABOUT MODAL -->
+  <div id="aboutModal" class="refs-modal">
+    <div class="refs-container"
+      style="max-width:600px;text-align:center;padding:40px;background:rgba(14,8,38,0.95);border:1px solid rgba(0,212,255,0.3);box-shadow:0 0 30px rgba(0,212,255,0.15);">
+      <div class="refs-header" style="justify-content:center;border-bottom:none;margin-bottom:10px;">
+        <h2
+          style="font-size:2.2rem;color:var(--neon-blue);letter-spacing:0.1em;text-shadow:0 0 10px rgba(0,212,255,0.5);">
+          ABOUT SIMU-VERSE</h2>
+      </div>
+      <p style="color:var(--text);line-height:1.7;font-size:1.05rem;margin-bottom:20px;">
+        SimuVerse is an interactive physics simulation platform designed to help students visualize and understand
+        complex concepts like Wave Optics, Projectile Motion, and Electrostatics.
+      </p>
+      <p style="color:var(--muted);line-height:1.6;font-size:0.95rem;margin-bottom:30px;">
+        Featuring <strong>NOVA</strong>, our built-in AI Physics Tutor, users can learn through guided lessons, interact
+        with real-time simulations, and ask questions using text or voice!
+      </p>
+      <button class="btn-proceed" onclick="closeAboutModal()"
+        style="width:auto;padding:12px 35px;background:linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(180, 79, 255, 0.1));border-color:var(--neon-blue);color:var(--neon-blue);">CLOSE</button>
+    </div>
+  </div>
+
+</body>
+
+</html>
