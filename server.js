@@ -17,7 +17,7 @@ app.use(express.static(path.join(__dirname)));
 const NVIDIA_MODEL = 'nvidia/nemotron-3-nano-30b-a3b';
 const NVIDIA_URL = 'https://integrate.api.nvidia.com/v1/chat/completions';
 
-const DEFAULT_SYSTEM_PROMPT = 'Physics Assistant: Answer only physics questions concisely. Always use LaTeX for math formulas (e.g., $E=mc^2$ or \\[V=IR\\]). Do not respond to non-physics content.';
+const DEFAULT_SYSTEM_PROMPT = 'Physics Assistant: Answer only physics questions concisely. Use Markdown for structure (lists, bold). For math: use $...$ for inline (e.g. $E=mc^2$) and $$...$$ for display equations (e.g. $$F=ma$$). Never use \\[ or \\( delimiters. Do not respond to non-physics content.';
 
 function sanitizeMessages(messages = []) {
   return messages

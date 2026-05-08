@@ -2040,7 +2040,11 @@ function initProjectileSim(canvas, panel, title, meas) {
     if (!animRunning || paused) return;
     if (lastFrame == null) lastFrame = ts || performance.now();
     const now = ts || performance.now();
-    const dt = Math.min(0.04, Math.max(0, (now - lastFrame) / 1000));
+    // Auto-scale: target ~3 seconds of wall-clock for the full flight
+    const targetWallTime = 3.0;
+    const autoSpeed = Math.max(1, physics.duration / targetWallTime);
+    const rawDt = Math.min(0.05, Math.max(0, (now - lastFrame) / 1000));
+    const dt = rawDt * autoSpeed;
     lastFrame = now;
     t = Math.min(physics.duration, t + dt);
     const cur = physics.at(t);
@@ -2383,7 +2387,7 @@ function showToast(msg) {
 
 // AI CHATBOT
 
-const CHAT_SYSTEM_PROMPT = 'Physics Assistant: Answer only physics questions concisely. Always use LaTeX for math formulas (e.g., $E=mc^2$ or \\[V=IR\\]).';
+const CHAT_SYSTEM_PROMPT = "Physics Assistant: Answer only physics questions concisely. Use Markdown for structure (lists, bold). For math: use single dollar signs for inline formulas (e.g. $E=mc^2$) and double dollar signs for display equations (e.g. $$F=ma$$). Never use backslash-bracket or backslash-paren delimiters.";
 
 
 const CHAT_CHIPS = {
@@ -2439,7 +2443,43 @@ function addBotMsg(text, thinking = '', save = true) {
 
   const contentEl = document.createElement('div');
   contentEl.className = 'msg-content';
-  contentEl.innerHTML = text.replace(/\n/g, '<br>');
+  
+  // Protect LaTeX from markdown: extract math blocks first, markdown second, re-insert third
+  let processed = text;
+  const mathPlaceholders = [];
+  
+  // Protect display math: \[...\] and $$...$$
+  processed = processed.replace(/\\\[([\s\S]*?)\\\]/g, (match) => {
+    mathPlaceholders.push(match);
+    return `%%MATH_${mathPlaceholders.length - 1}%%`;
+  });
+  processed = processed.replace(/\$\$([\s\S]*?)\$\$/g, (match) => {
+    mathPlaceholders.push(match);
+    return `%%MATH_${mathPlaceholders.length - 1}%%`;
+  });
+  // Protect inline math: \(...\) and $...$
+  processed = processed.replace(/\\\(([\s\S]*?)\\\)/g, (match) => {
+    mathPlaceholders.push(match);
+    return `%%MATH_${mathPlaceholders.length - 1}%%`;
+  });
+  processed = processed.replace(/\$([^\$\n]+?)\$/g, (match) => {
+    mathPlaceholders.push(match);
+    return `%%MATH_${mathPlaceholders.length - 1}%%`;
+  });
+  
+  // Now run markdown on the safe text
+  if (window.marked && typeof window.marked.parse === 'function') {
+    processed = window.marked.parse(processed);
+  } else {
+    processed = processed.replace(/\n/g, '<br>');
+  }
+  
+  // Re-insert the LaTeX blocks
+  mathPlaceholders.forEach((block, i) => {
+    processed = processed.replace(`%%MATH_${i}%%`, block);
+  });
+  
+  contentEl.innerHTML = processed;
   el.appendChild(contentEl);
 
   msgs.appendChild(el);

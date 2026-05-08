@@ -1147,18 +1147,20 @@
 
     .chat-window {
       position: absolute;
-      bottom: 70px;
+      bottom: 75px;
       right: 0;
-      width: 360px;
-      height: 480px;
-      background: rgba(14, 8, 38, 0.97);
-      border: 1px solid rgba(180, 79, 255, 0.3);
-      border-radius: 20px;
+      width: 400px;
+      height: 550px;
+      background: rgba(12, 10, 25, 0.94);
+      border: 1px solid rgba(180, 79, 255, 0.35);
+      border-radius: 24px;
       display: none;
       flex-direction: column;
       overflow: hidden;
-      backdrop-filter: blur(20px);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), var(--glow-purple);
+      backdrop-filter: blur(25px);
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.6), 0 0 30px rgba(180, 79, 255, 0.15);
+      z-index: 1000;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .chat-window.open {
@@ -1245,42 +1247,103 @@
     }
 
     .msg {
-      max-width: 85%;
-      padding: 10px 14px;
-      border-radius: 14px;
-      font-size: 0.85rem;
-      line-height: 1.5;
-      animation: msgIn 0.3s ease;
+      max-width: 90%;
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      animation: msgIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
     }
 
     @keyframes msgIn {
       from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(15px) scale(0.98);
       }
-
       to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
       }
     }
 
     .msg.bot {
-      background: rgba(180, 79, 255, 0.15);
-      border: 1px solid rgba(180, 79, 255, 0.4);
-      border-radius: 14px 14px 14px 4px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(180, 79, 255, 0.25);
+      border-radius: 18px 18px 18px 4px;
       align-self: flex-start;
-      color: var(--text);
-      box-shadow: 0 0 10px rgba(180, 79, 255, 0.2);
+      color: #f1f3ff;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
 
     .msg.user {
-      background: rgba(0, 212, 255, 0.15);
-      border: 1px solid rgba(0, 212, 255, 0.4);
-      border-radius: 14px 14px 4px 14px;
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(76, 201, 240, 0.08));
+      border: 1px solid rgba(0, 212, 255, 0.35);
+      border-radius: 18px 18px 4px 18px;
       align-self: flex-end;
-      color: var(--text);
-      box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+      color: #fff;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+
+    /* Markdown styling within messages */
+    .msg-content h1, .msg-content h2, .msg-content h3 {
+      margin: 12px 0 8px;
+      color: var(--neon-blue);
+      font-size: 1.1rem;
+    }
+    .msg-content p {
+      margin-bottom: 8px;
+    }
+    .msg-content p:last-child {
+      margin-bottom: 0;
+    }
+    .msg-content ul, .msg-content ol {
+      margin: 8px 0 12px 20px;
+    }
+    .msg-content li {
+      margin-bottom: 4px;
+    }
+    .msg-content code {
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      color: var(--neon-green);
+    }
+    .msg-content pre {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 12px;
+      border-radius: 8px;
+      margin: 10px 0;
+      overflow-x: auto;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .msg-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 0.8rem;
+    }
+    .msg-content th, .msg-content td {
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 8px;
+      text-align: left;
+    }
+    .msg-content th {
+      background: rgba(180, 79, 255, 0.1);
+      color: var(--neon-purple);
+    }
+
+    .thinking-block {
+      background: rgba(0, 212, 255, 0.05);
+      border-left: 2px solid var(--neon-blue);
+      padding: 8px 12px;
+      margin-bottom: 12px;
+      border-radius: 4px 8px 8px 4px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-style: italic;
     }
 
     .msg.typing .dots {
